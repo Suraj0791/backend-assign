@@ -1,11 +1,4 @@
-const { createClient } = require("redis");
-
-const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
-});
-
-redisClient.on("error", (err) => console.error("Redis Client Error", err));
-redisClient.connect().catch(console.error);
+const { redisHelper } = require("../config/redis.config");
 
 const cacheMiddleware = (duration) => {
   return async (req, res, next) => {
@@ -16,10 +9,10 @@ const cacheMiddleware = (duration) => {
     const key = `cache:${req.originalUrl || req.url}`;
 
     try {
-      const cachedResponse = await redisClient.get(key);
+      const cachedResponse = await redisHelper.get(key);
 
       if (cachedResponse) {
-        return res.json(JSON.parse(cachedResponse));
+        return res.json(cachedResponse);
       }
 
       // Store the original res.json method
@@ -28,8 +21,8 @@ const cacheMiddleware = (duration) => {
       // Override res.json method
       res.json = function (body) {
         // Store the response in cache
-        redisClient
-          .setEx(key, duration, JSON.stringify(body))
+        redisHelper
+          .setEx(key, duration, body)
           .catch((err) => console.error("Cache Error:", err));
 
         // Call the original res.json method
@@ -46,9 +39,9 @@ const cacheMiddleware = (duration) => {
 
 const clearCache = async (pattern) => {
   try {
-    const keys = await redisClient.keys(`cache:${pattern}`);
+    const keys = await redisHelper.keys(`cache:${pattern}`);
     if (keys.length > 0) {
-      await redisClient.del(keys);
+      await Promise.all(keys.map((key) => redisHelper.del(key)));
     }
   } catch (error) {
     console.error("Clear Cache Error:", error);
