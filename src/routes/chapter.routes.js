@@ -5,19 +5,30 @@ const {
   getChapterById,
   uploadChapters,
 } = require("../controllers/chapter.controller");
-const { adminAuth } = require("../middleware/auth.middleware");
+const {
+  authenticateAdmin,
+  optionalAuth,
+  requireAdmin,
+} = require("../middleware/auth.middleware");
 const { cacheMiddleware } = require("../middleware/cache.middleware");
-const multer = require("multer");
-
-const upload = multer({ storage: multer.memoryStorage() });
+const {
+  upload,
+  handleUploadError,
+} = require("../middleware/upload.middleware");
 
 // GET all chapters with filters, pagination, and caching
-router.get("/", cacheMiddleware(3600), getChapters);
+router.get("/", cacheMiddleware(3600), optionalAuth, getChapters);
 
 // GET chapter by ID
-router.get("/:id", getChapterById);
+router.get("/:id", optionalAuth, getChapterById);
 
 // POST upload chapters (admin only, JSON file upload)
-router.post("/", adminAuth, upload.single("file"), uploadChapters);
+router.post(
+  "/upload",
+  authenticateAdmin,
+  upload.single("file"),
+  handleUploadError,
+  uploadChapters
+);
 
 module.exports = router;

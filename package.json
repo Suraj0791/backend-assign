@@ -6,23 +6,29 @@
     "scripts": {
         "start": "node src/index.js",
         "dev": "nodemon src/index.js",
-        "test": "jest"
+        "test": "jest",
+        "test:api": "newman run mathongo-chapter-dashboard.postman_collection.json -d test-data.json -r htmlextra"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
+        "connect-redis": "^8.1.0",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "express-rate-limit": "^7.1.5",
         "express-validator": "^7.0.1",
+        "ioredis": "^4.28.3",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.0.3",
         "multer": "^1.4.5-lts.1",
-        "redis": "^4.6.12",
+        "rate-limit-redis": "^4.2.1",
+        "redis": "^3.1.2",
         "winston": "^3.11.0"
     },
     "devDependencies": {
         "jest": "^29.7.0",
+        "newman": "^6.2.1",
+        "newman-reporter-htmlextra": "^1.23.1",
         "nodemon": "^3.0.2",
         "supertest": "^6.3.3"
     },

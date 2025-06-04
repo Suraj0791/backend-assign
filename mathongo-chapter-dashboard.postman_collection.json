@@ -1,15 +1,36 @@
 {
     "info": {
         "name": "MathonGo Chapter Dashboard API",
-        "description": "API collection for Chapter Performance Dashboard",
+        "description": "A RESTful API for managing chapter performance data with features like caching, rate limiting, and pagination.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
         {
             "name": "Authentication",
+            "description": "Endpoints for user authentication and registration",
             "item": [
                 {
                     "name": "Register Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 201\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('user');",
+                                    "    pm.expect(jsonData.user).to.have.property('username');",
+                                    "    pm.expect(jsonData.user).to.have.property('role');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -20,7 +41,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\",\n    \"role\": \"admin\"\n}"
+                            "raw": "{\n    \"username\": \"{{test_username}}\",\n    \"password\": \"{{test_password}}\",\n    \"role\": \"admin\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v1/auth/register",
@@ -33,11 +54,31 @@
                                 "auth",
                                 "register"
                             ]
-                        }
+                        },
+                        "description": "Register a new admin user. This endpoint should be used only for initial setup."
                     }
                 },
                 {
                     "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has token\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('token');",
+                                    "    pm.environment.set(\"token\", jsonData.token);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -48,7 +89,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+                            "raw": "{\n    \"username\": \"{{test_username}}\",\n    \"password\": \"{{test_password}}\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v1/auth/login",
@@ -61,21 +102,50 @@
                                 "auth",
                                 "login"
                             ]
-                        }
+                        },
+                        "description": "Login to get JWT token for authenticated requests"
                     }
                 }
             ]
         },
         {
             "name": "Chapters",
+            "description": "Endpoints for managing chapter data",
             "item": [
                 {
                     "name": "Get All Chapters",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has chapters array\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('chapters');",
+                                    "    pm.expect(jsonData.chapters).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has pagination info\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('pagination');",
+                                    "    pm.expect(jsonData.pagination).to.have.property('total');",
+                                    "    pm.expect(jsonData.pagination).to.have.property('page');",
+                                    "    pm.expect(jsonData.pagination).to.have.property('limit');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{base_url}}/api/v1/chapters?page=1&limit=10&class=Class 11&subject=Physics&status=Completed&weakChapters=true",
+                            "raw": "{{base_url}}/api/v1/chapters?page={{page}}&limit={{limit}}&class={{class}}&subject={{subject}}&status={{status}}&weakChapters={{weakChapters}}",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -87,34 +157,62 @@
                             "query": [
                                 {
                                     "key": "page",
-                                    "value": "1"
+                                    "value": "{{page}}",
+                                    "description": "Page number for pagination"
                                 },
                                 {
                                     "key": "limit",
-                                    "value": "10"
+                                    "value": "{{limit}}",
+                                    "description": "Number of items per page"
                                 },
                                 {
                                     "key": "class",
-                                    "value": "Class 11"
+                                    "value": "{{class}}",
+                                    "description": "Filter by class"
                                 },
                                 {
                                     "key": "subject",
-                                    "value": "Physics"
+                                    "value": "{{subject}}",
+                                    "description": "Filter by subject"
                                 },
                                 {
                                     "key": "status",
-                                    "value": "Completed"
+                                    "value": "{{status}}",
+                                    "description": "Filter by status (Not Started, In Progress, Completed)"
                                 },
                                 {
                                     "key": "weakChapters",
-                                    "value": "true"
+                                    "value": "{{weakChapters}}",
+                                    "description": "Filter by weak chapters (true/false)"
                                 }
                             ]
-                        }
+                        },
+                        "description": "Get all chapters with filtering and pagination. Results are cached for 1 hour."
                     }
                 },
                 {
                     "name": "Get Chapter by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has chapter data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('chapter');",
+                                    "    pm.expect(jsonData.chapter).to.have.property('_id');",
+                                    "    pm.expect(jsonData.chapter).to.have.property('subject');",
+                                    "    pm.expect(jsonData.chapter).to.have.property('chapter');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "GET",
                         "header": [],
@@ -132,14 +230,36 @@
                             "variable": [
                                 {
                                     "key": "id",
-                                    "value": "chapter_id_here"
+                                    "value": "{{chapter_id}}",
+                                    "description": "MongoDB ID of the chapter"
                                 }
                             ]
-                        }
+                        },
+                        "description": "Get a specific chapter by its ID"
                     }
                 },
                 {
                     "name": "Upload Chapters",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has upload results\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('message');",
+                                    "    pm.expect(jsonData).to.have.property('uploaded');",
+                                    "    pm.expect(jsonData).to.have.property('failed');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -154,7 +274,8 @@
                                 {
                                     "key": "file",
                                     "type": "file",
-                                    "src": "/path/to/chapters.json"
+                                    "src": "sample-chapters.json",
+                                    "description": "JSON file containing chapter data"
                                 }
                             ]
                         },
@@ -168,20 +289,99 @@
                                 "v1",
                                 "chapters"
                             ]
-                        }
+                        },
+                        "description": "Upload chapters data (Admin only). Accepts JSON file upload. Returns failed uploads if any."
                     }
                 }
             ]
         }
     ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
     "variable": [
         {
             "key": "base_url",
-            "value": "http://localhost:3000"
+            "value": "http://localhost:3000",
+            "type": "string",
+            "description": "Base URL for the API"
         },
         {
             "key": "token",
-            "value": "your_jwt_token_here"
+            "value": "",
+            "type": "string",
+            "description": "JWT token for authenticated requests"
+        },
+        {
+            "key": "test_username",
+            "value": "testadmin",
+            "type": "string",
+            "description": "Test username for authentication"
+        },
+        {
+            "key": "test_password",
+            "value": "testpass123",
+            "type": "string",
+            "description": "Test password for authentication"
+        },
+        {
+            "key": "page",
+            "value": "1",
+            "type": "string",
+            "description": "Page number for pagination"
+        },
+        {
+            "key": "limit",
+            "value": "10",
+            "type": "string",
+            "description": "Number of items per page"
+        },
+        {
+            "key": "class",
+            "value": "Class 11",
+            "type": "string",
+            "description": "Class filter"
+        },
+        {
+            "key": "subject",
+            "value": "Physics",
+            "type": "string",
+            "description": "Subject filter"
+        },
+        {
+            "key": "status",
+            "value": "Completed",
+            "type": "string",
+            "description": "Status filter"
+        },
+        {
+            "key": "weakChapters",
+            "value": "true",
+            "type": "string",
+            "description": "Weak chapters filter"
+        },
+        {
+            "key": "chapter_id",
+            "value": "",
+            "type": "string",
+            "description": "Chapter ID for specific chapter requests"
         }
     ]
 }

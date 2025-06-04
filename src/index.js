@@ -1,11 +1,12 @@
+// src/index.js
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { createClient } = require("redis");
 const rateLimit = require("express-rate-limit");
-const RedisStore = require("rate-limit-redis");
 const winston = require("winston");
+
+const { connectRedis } = require("./config/redis.config");
 
 // Import routes
 const chapterRoutes = require("./routes/chapter.routes");
@@ -14,7 +15,7 @@ const authRoutes = require("./routes/auth.routes");
 // Create Express app
 const app = express();
 
-// Configure logger
+// Configure Winston logger
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -35,35 +36,25 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-// Redis client setup
-const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
-});
-
-redisClient.on("error", (err) => logger.error("Redis Client Error", err));
-redisClient.connect().catch(console.error);
-
-// Rate limiter configuration
-const limiter = rateLimit({
-  store: new RedisStore({
-    sendCommand: (...args) => redisClient.sendCommand(args),
-  }),
-  windowMs: 60 * 1000, // 1 minute
-  max: 30, // 30 requests per minute
-  message: "Too many requests from this IP, please try again after a minute",
-});
-
-// Middleware
+// Global Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate limiter configuration (in-memory store)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 app.use(limiter);
 
 // Routes
 app.use("/api/v1/chapters", chapterRoutes);
 app.use("/api/v1/auth", authRoutes);
 
-// Error handling middleware
+// Error-handling middleware
 app.use((err, req, res, next) => {
   logger.error(err.stack);
   res.status(err.status || 500).json({
@@ -72,22 +63,30 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB connection
-mongoose
-  .connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/chapter-dashboard"
-  )
-  .then(() => {
+// Initialize MongoDB, Redis, and start server
+const initializeApp = async () => {
+  try {
+    // 1. Connect to MongoDB
+    await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/chapter-dashboard"
+    );
     logger.info("Connected to MongoDB");
-  })
-  .catch((err) => {
-    logger.error("MongoDB connection error:", err);
-  });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
-});
+    // 2. Connect to Redis
+    // await connectRedis();
+    logger.info("Connected to Redis");
 
-module.exports = app; // For testing purposes
+    // 3. Start Express server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    logger.error("Failed to initialize application:", error);
+    process.exit(1);
+  }
+};
+
+initializeApp();
+
+module.exports = app; // for testing purposes (e.g., supertest/jest)
