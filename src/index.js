@@ -72,9 +72,14 @@ const initializeApp = async () => {
     );
     logger.info("Connected to MongoDB");
 
-    // 2. Connect to Redis
-    // await connectRedis();
-    logger.info("Connected to Redis");
+    // 2. Connect to Redis (with better error handling)
+    try {
+      await connectRedis();
+      logger.info("Connected to Redis");
+    } catch (error) {
+      logger.warn("Failed to connect to Redis, continuing without Redis:", error.message);
+      // Continue without Redis - the app can still function
+    }
 
     // 3. Start Express server
     const PORT = process.env.PORT || 3000;

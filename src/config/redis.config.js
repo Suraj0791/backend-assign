@@ -1,88 +1,165 @@
 // config/redis.config.js
-const redis = require("redis");
+const { createClient } = require("redis");
 const winston = require("winston");
-const { promisify } = require("util");
 
 let redisClient = null;
+let isConnecting = false;
+let connectionPromise = null;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 5000; // 5 seconds
 
 const connectRedis = async () => {
-  try {
-    const redisConfig = {
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT) || 6379,
-      password: process.env.REDIS_PASSWORD || undefined,
-      username: process.env.REDIS_USERNAME || "default",
-      db: process.env.REDIS_DB || 0
-    };
-
-    // legacyMode:true allows us to use callback-based commands + promisify
-    const options = {
-      host: redisConfig.host,
-      port: redisConfig.port,
-      username: redisConfig.username,
-      password: redisConfig.password,
-      legacyMode: true
-    };
-
-    redisClient = redis.createClient(options);
-
-    // Attach event handlers
-    redisClient.on("connect", () => {
-      winston.info("Redis connected");
-    });
-
-    redisClient.on("ready", () => {
-      winston.info("Redis ready");
-    });
-
-    redisClient.on("error", (err) => {
-      winston.error("Redis connection error:", err);
-    });
-
-    redisClient.on("end", () => {
-      winston.info("Redis connection closed");
-    });
-
-    // Connect (in legacy mode)
-    await redisClient.connect();
-
-    // Test the connection once
-    const setAsync = promisify(redisClient.set).bind(redisClient);
-    const getAsync = promisify(redisClient.get).bind(redisClient);
-
-    await setAsync("test", "Redis Cloud Connected");
-    const testResult = await getAsync("test");
-    winston.info("Redis Cloud Test:", testResult);
-
-    // Graceful shutdown on SIGINT
-    process.on("SIGINT", async () => {
-      if (redisClient) {
-        await redisClient.quit();
-        winston.info("Redis connection closed through app termination");
-      }
-    });
-  } catch (error) {
-    winston.error("Redis setup failed:", error);
-    process.exit(1);
+  // If already connecting, return the existing promise
+  if (isConnecting && connectionPromise) {
+    console.log("Redis connection already in progress, waiting...");
+    return connectionPromise;
   }
+
+  // If already connected, return the client
+  if (redisClient?.isOpen) {
+    console.log("Redis client already connected");
+    return redisClient;
+  }
+
+  isConnecting = true;
+  let retries = 0;
+
+  connectionPromise = new Promise(async (resolve, reject) => {
+    while (retries < MAX_RETRIES) {
+      try {
+        // Clean up any existing client
+        if (redisClient && !redisClient.isOpen) {
+          try {
+            await redisClient.disconnect();
+          } catch (e) {
+            console.log("Error disconnecting old client:", e.message);
+          }
+          redisClient = null;
+        }
+
+        const redisConfig = {
+          url: `redis://${process.env.REDIS_USERNAME || 'default'}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST || 'localhost'}:${parseInt(process.env.REDIS_PORT) || 6379}/${process.env.REDIS_DB || 0}`,
+          socket: {
+            reconnectStrategy: (retries) => {
+              if (retries > 10) {
+                console.log("Redis max reconnection attempts reached");
+                return new Error("Redis max reconnection attempts reached");
+              }
+              return Math.min(retries * 100, 3000);
+            },
+            connectTimeout: 10000,
+            lazyConnect: true,
+          },
+        };
+
+        console.log("Connecting to Redis with config:", {
+          host: process.env.REDIS_HOST,
+          port: process.env.REDIS_PORT,
+          username: process.env.REDIS_USERNAME || 'default',
+          database: process.env.REDIS_DB || 0,
+        });
+
+        // Create Redis client
+        redisClient = createClient(redisConfig);
+
+        // Attach event handlers BEFORE connecting
+        redisClient.on("connect", () => {
+          console.log("Redis connected successfully");
+          winston.info("Redis connected");
+        });
+
+        redisClient.on("ready", () => {
+          console.log("Redis client ready");
+          winston.info("Redis ready");
+          isConnecting = false;
+        });
+
+        redisClient.on("error", (err) => {
+          console.error("Redis connection error:", err);
+          winston.error("Redis connection error:", err);
+          // Don't set isConnecting to false here, let the connection attempt handle it
+        });
+
+        redisClient.on("end", () => {
+          console.log("Redis connection closed");
+          winston.info("Redis connection closed");
+          redisClient = null;
+          isConnecting = false;
+          connectionPromise = null;
+        });
+
+        redisClient.on("reconnecting", () => {
+          console.log("Redis reconnecting...");
+          winston.info("Redis reconnecting");
+        });
+
+        // Connect to Redis
+        await redisClient.connect();
+
+        // Test the connection
+        await redisClient.set("test", "Redis Connected");
+        const testResult = await redisClient.get("test");
+        console.log("Redis Test Result:", testResult);
+        winston.info("Redis Test:", testResult);
+
+        // Graceful shutdown on SIGINT
+        process.on("SIGINT", async () => {
+          if (redisClient && redisClient.isOpen) {
+            await redisClient.quit();
+            console.log("Redis connection closed through app termination");
+            winston.info("Redis connection closed through app termination");
+          }
+        });
+
+        isConnecting = false;
+        resolve(redisClient);
+        return;
+
+      } catch (error) {
+        console.error(`Redis connection attempt ${retries + 1} failed:`, error);
+        retries++;
+
+        if (retries < MAX_RETRIES) {
+          console.log(
+            `Retrying Redis connection in ${RETRY_DELAY / 1000} seconds...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+        } else {
+          console.error("Max Redis connection retries reached");
+          isConnecting = false;
+          connectionPromise = null;
+          reject(error);
+          return;
+        }
+      }
+    }
+  });
+
+  return connectionPromise;
 };
 
-const getRedisClient = () => {
-  if (!redisClient) {
-    throw new Error("Redis client not initialized. Call connectRedis() first.");
+const getRedisClient = async () => {
+  if (!redisClient?.isOpen) {
+    console.log("Redis client not available, attempting to connect...");
+    await connectRedis();
   }
+  
+  if (!redisClient?.isOpen) {
+    throw new Error("Redis client not initialized or closed. Connection failed.");
+  }
+  
   return redisClient;
 };
 
-// Helper functions for Redis operations
+// Helper functions for Redis operations with better error handling
 const redisHelper = {
   // Set key with expiration
   setEx: async (key, seconds, value) => {
     try {
-      const setExAsync = promisify(redisClient.setex).bind(redisClient);
-      return await setExAsync(key, seconds, JSON.stringify(value));
+      const client = await getRedisClient();
+      return await client.setEx(key, seconds, JSON.stringify(value));
     } catch (error) {
-      winston.error("Redis SetEx Error:", error);
+      console.error("Redis SetEx Error:", error);
       throw error;
     }
   },
@@ -90,11 +167,11 @@ const redisHelper = {
   // Get value by key
   get: async (key) => {
     try {
-      const getAsync = promisify(redisClient.get).bind(redisClient);
-      const value = await getAsync(key);
+      const client = await getRedisClient();
+      const value = await client.get(key);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      winston.error("Redis Get Error:", error);
+      console.error("Redis Get Error:", error);
       throw error;
     }
   },
@@ -102,10 +179,10 @@ const redisHelper = {
   // Delete key
   del: async (key) => {
     try {
-      const delAsync = promisify(redisClient.del).bind(redisClient);
-      return await delAsync(key);
+      const client = await getRedisClient();
+      return await client.del(key);
     } catch (error) {
-      winston.error("Redis Delete Error:", error);
+      console.error("Redis Delete Error:", error);
       throw error;
     }
   },
@@ -113,10 +190,10 @@ const redisHelper = {
   // Get all keys matching pattern
   keys: async (pattern) => {
     try {
-      const keysAsync = promisify(redisClient.keys).bind(redisClient);
-      return await keysAsync(pattern);
+      const client = await getRedisClient();
+      return await client.keys(pattern);
     } catch (error) {
-      winston.error("Redis Keys Error:", error);
+      console.error("Redis Keys Error:", error);
       throw error;
     }
   },
@@ -124,17 +201,56 @@ const redisHelper = {
   // Clear all cache
   clearAll: async () => {
     try {
-      await redisClient.flushall();
-      winston.info("Redis cache cleared");
+      const client = await getRedisClient();
+      await client.flushAll();
+      console.log("Redis cache cleared");
     } catch (error) {
-      winston.error("Redis Clear All Error:", error);
+      console.error("Redis Clear All Error:", error);
       throw error;
     }
-  }
+  },
+
+  // Increment counter
+  incr: async (key) => {
+    try {
+      const client = await getRedisClient();
+      return await client.incr(key);
+    } catch (error) {
+      console.error("Redis Incr Error:", error);
+      throw error;
+    }
+  },
+
+  // Set expiration
+  expire: async (key, seconds) => {
+    try {
+      const client = await getRedisClient();
+      return await client.expire(key, seconds);
+    } catch (error) {
+      console.error("Redis Expire Error:", error);
+      throw error;
+    }
+  },
+
+  // Ping Redis
+  ping: async () => {
+    try {
+      const client = await getRedisClient();
+      return await client.ping();
+    } catch (error) {
+      console.error("Redis Ping Error:", error);
+      throw error;
+    }
+  },
+
+  // Check if Redis is connected
+  isConnected: () => {
+    return redisClient?.isOpen || false;
+  },
 };
 
 module.exports = {
   connectRedis,
   getRedisClient,
-  redisHelper
+  redisHelper,
 };

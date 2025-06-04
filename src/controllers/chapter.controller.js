@@ -53,7 +53,31 @@ exports.getChapterById = async (req, res, next) => {
   }
 };
 
-// POST /api/v1/chapters
+// POST /api/v1/chapters (create a single chapter)
+exports.createChapter = async (req, res, next) => {
+  try {
+    const chapterData = req.body;
+    const chapter = new Chapter(chapterData);
+    await chapter.save();
+
+    // Invalidate cache for the main chapters list and any specific queries
+    await clearCache('/api/v1/chapters*'); 
+
+    res.status(201).json({
+      status: "success",
+      message: "Chapter created successfully",
+      data: chapter,
+    });
+  } catch (error) {
+    // Handle validation errors or other save errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ status: "error", message: error.message });
+    }
+    next(error);
+  }
+};
+
+// POST /api/v1/chapters/upload
 exports.uploadChapters = async (req, res, next) => {
   try {
     if (!req.file) {
