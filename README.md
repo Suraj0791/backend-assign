@@ -366,3 +366,89 @@ For support, please contact the development team or create an issue in the repos
 ## License
 
 MIT License
+
+## Deployment Guide
+
+### GitHub Actions Deployment (EC2)
+
+The application is automatically deployed to EC2 when changes are pushed to the main branch. The workflow:
+
+1. Triggers on push to main branch
+2. Sets up Node.js 18.17.0
+3. Deploys to EC2 via SSH
+4. Restarts the application using PM2
+
+#### Required GitHub Secrets
+
+Set these secrets in your GitHub repository (Settings > Secrets and variables > Actions):
+
+- `EC2_HOST`: Your EC2 instance IP/hostname
+- `EC2_USERNAME`: SSH username (usually 'ubuntu')
+- `EC2_PRIVATE_KEY`: The content of your EC2 SSH private key file
+
+#### Manual EC2 Setup
+
+1. Install Node.js 18.x and PM2 on your EC2 instance
+2. Clone the repository to `~/mathongo-backend`
+3. Install dependencies: `npm install`
+4. Start the application: `pm2 start npm --name "mathongo-api" -- start`
+
+### Render Deployment
+
+#### Setup Instructions
+
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Configure the following settings:
+   - **Environment**: Node.js
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+
+#### Environment Variables
+
+Set these in Render dashboard (Dashboard > Your Service > Environment):
+
+```env
+NODE_ENV=production
+PORT=3000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+# Add any other environment variables your app needs
+```
+
+#### Features
+
+- Automatic HTTPS/SSL
+- Automatic deployments on push to main branch
+- Zero-downtime deployments
+- Built-in logging and monitoring
+
+#### Limitations (Free Tier)
+
+- Spins down after 15 minutes of inactivity
+- 512 MB RAM limit
+- Shared CPU
+- 750 hours/month included
+
+### PM2 Commands Reference
+
+```bash
+# List all processes
+pm2 list
+
+# Restart all applications
+pm2 restart all
+
+# View logs
+pm2 logs
+
+# Monitor processes
+pm2 monit
+
+# Stop all applications
+pm2 stop all
+```
+
+## Health Check
+
+The API includes a health check endpoint at `/health` that returns server status.

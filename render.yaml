@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: mathongo-backend
+    env: node
+    region: frankfurt # Choose your preferred region
+    plan: free # or switch to 'starter' or 'standard' for paid plans
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      # Secrets - configure these in the Render dashboard
+      - key: MONGODB_URI
+        sync: false # This means it's a secret you'll set in dashboard
+      - key: JWT_SECRET
+        sync: false
+    autoDeploy: true # Enable auto-deployment on push to main branch
