@@ -16,38 +16,17 @@ jobs:
       # Step 1: Check out the repository code
       - uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js environment
+      # Step 2: Set up Node.js environment (without cache)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18.17.0" # Use specific Node.js version for consistency
 
-      # Step 3: Cache npm dependencies with retry logic
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        id: npm-cache
-        continue-on-error: true # Don't fail the workflow if cache fails
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      # Step 4: Retry cache on failure
-      - name: Retry Cache on Failure
-        uses: actions/cache@v3
-        if: steps.npm-cache.outcome == 'failure'
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      # Step 5: Install dependencies (will use cache if available)
+      # Step 3: Install dependencies directly
       - name: Install Dependencies
         run: npm ci --production
 
-      # Step 6: Deploy to EC2 using SSH
+      # Step 4: Deploy to EC2 using SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
