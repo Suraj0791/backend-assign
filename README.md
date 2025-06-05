@@ -5,7 +5,7 @@
 - Base URL: `http://13.60.65.158`
 - API Documentation: `http://13.60.65.158/api/docs`
 - AWS EC2: `http://13.60.65.158`
-- Render: `https://mathongo-backend.onrender.com` (Add your Render URL after deployment)
+- Render: `https://backend-assign-inoj.onrender.com` (Add your Render URL after deployment)
 
 ## Deployment Information
 
