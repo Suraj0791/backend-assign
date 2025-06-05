@@ -1,0 +1,408 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "MathonGo Chapter Dashboard",
+        "description": "API collection for MathonGo Chapter Dashboard with admin authentication and chapter management",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "description": "Authentication endpoints for user registration and login",
+            "item": [
+                {
+                    "name": "Register Regular User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"testuser_{{$timestamp}}\",\n    \"password\": \"Test123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new regular user with a unique username using a timestamp."
+                    }
+                },
+                {
+                    "name": "Setup Admin User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (pm.response.code === 201 && jsonData.status === 'success') {",
+                                    "    var createdUsername = pm.request.body.raw ? JSON.parse(pm.request.body.raw).username : null;",
+                                    "    if (createdUsername) {",
+                                    "        pm.environment.set('admin_username', createdUsername);",
+                                    "        console.log('Captured admin username: ' + createdUsername);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "x-api-key",
+                                "value": "{{admin_api_key}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"admin_{{$timestamp}}\",\n    \"password\": \"Admin123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/setup-admin",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "setup-admin"
+                            ]
+                        },
+                        "description": "Create a new admin user with a unique username using a timestamp (requires admin API key)"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.environment.set('auth_token', jsonData.token);",
+                                    "    console.log('Captured auth token.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{admin_username}}\",\n    \"password\": \"Admin123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login with the admin username captured from the setup request to get JWT token."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Chapters",
+            "description": "Chapter management endpoints",
+            "item": [
+                {
+                    "name": "Get All Chapters",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/chapters?page=1&limit=10&class=12&unit=1&status=active&weakChapters=true&subject=Mathematics",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number for pagination"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Number of items per page"
+                                },
+                                {
+                                    "key": "class",
+                                    "value": "12",
+                                    "description": "Filter by class"
+                                },
+                                {
+                                    "key": "unit",
+                                    "value": "1",
+                                    "description": "Filter by unit"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "active",
+                                    "description": "Filter by status"
+                                },
+                                {
+                                    "key": "weakChapters",
+                                    "value": "true",
+                                    "description": "Filter weak chapters"
+                                },
+                                {
+                                    "key": "subject",
+                                    "value": "Mathematics",
+                                    "description": "Filter by subject"
+                                }
+                            ]
+                        },
+                        "description": "Get all chapters with filters and pagination"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Chapter",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data.id) {",
+                                    "    pm.environment.set('chapter_id', jsonData.data.id);",
+                                    "    console.log('Captured chapter ID: ' + jsonData.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Integration\",\n    \"class\": 12,\n    \"unit\": 1,\n    \"subject\": \"Mathematics\",\n    \"status\": \"active\",\n    \"isWeakChapter\": false,\n    \"description\": \"Integration techniques and applications\",\n    \"difficultyLevel\": \"medium\",\n    \"estimatedTime\": 120,\n    \"prerequisites\": [\"Differentiation\", \"Basic Calculus\"],\n    \"learningObjectives\": [\n        \"Understand integration techniques\",\n        \"Apply integration in real-world problems\"\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/chapters",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters"
+                            ]
+                        },
+                        "description": "Create a new chapter. Requires admin authentication."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Chapter by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters",
+                                "{{chapter_id}}"
+                            ]
+                        },
+                        "description": "Get a specific chapter by its ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Chapter",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Advanced Integration\",\n    \"class\": 12,\n    \"unit\": 1,\n    \"subject\": \"Mathematics\",\n    \"status\": \"active\",\n    \"isWeakChapter\": true,\n    \"description\": \"Advanced integration techniques and applications\",\n    \"difficultyLevel\": \"hard\",\n    \"estimatedTime\": 150,\n    \"prerequisites\": [\"Basic Integration\", \"Calculus\"],\n    \"learningObjectives\": [\n        \"Master advanced integration techniques\",\n        \"Apply integration in complex problems\"\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters",
+                                "{{chapter_id}}"
+                            ]
+                        },
+                        "description": "Update an existing chapter."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Upload Multiple Chapters",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "sample-chapters.json"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/chapters/upload",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters",
+                                "upload"
+                            ]
+                        },
+                        "description": "Upload multiple chapters via JSON file."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Chapter",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chapters",
+                                "{{chapter_id}}"
+                            ]
+                        },
+                        "description": "Delete a chapter."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Generate a timestamp for unique usernames",
+                    "pm.environment.set('timestamp', Date.now());"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "auth_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "chapter_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "admin_api_key",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "admin_username",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

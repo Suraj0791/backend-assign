@@ -1,13 +1,14 @@
 {
-    "name": "mathongo-chapter-dashboard",
+    "name": "backend-assign",
     "version": "1.0.0",
     "description": "Chapter Performance Dashboard API",
     "main": "src/index.js",
     "scripts": {
         "start": "node src/index.js",
-        "dev": "nodemon src/index.js",
+        "dev": "nodemon --watch src --watch .env --ext js,json,env --ignore src/tests/* --exec node src/index.js",
         "test": "jest",
-        "test:api": "newman run mathongo-chapter-dashboard.postman_collection.json -d test-data.json -r htmlextra"
+        "test:api": "newman run mathongo-chapter-dashboard.postman_collection.json -d test-data.json -r htmlextra",
+        "test:watch": "nodemon --watch test-api.js --watch src --ext js,json --exec node test-api.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -33,7 +34,7 @@
         "newman": "^6.2.1",
         "newman-reporter-htmlextra": "^1.23.1",
         "node-fetch": "^3.3.2",
-        "nodemon": "^3.0.2",
+        "nodemon": "^3.1.10",
         "supertest": "^6.3.3"
     },
     "engines": {
