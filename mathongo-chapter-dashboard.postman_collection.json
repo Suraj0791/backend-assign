@@ -505,7 +505,7 @@
                 {
                   "key": "file",
                   "type": "file",
-                  "src": null,
+                  "src": "./sample-chapters.json",
                   "enabled": true
                 }
               ]
@@ -522,7 +522,7 @@
                 "upload"
               ]
             },
-            "description": "Upload multiple chapters via JSON file. File must contain an array of chapter objects.\n\n**Rate Limits:**\n- 5 requests per minute for bulk uploads\n- 900 second (15 minute) cooldown on rate limit exceeded\n\n**Important Notes:**\n- Wait at least 15 seconds between upload attempts\n- Collection enforces automatic delays\n- Rate limit is shared across all requests from same IP\n\n**Required Headers:**\n- x-api-key: Admin API key\n\n**Response:**\n- 200: Upload successful\n- 400: Invalid file format\n- 401: Missing/invalid API key\n- 429: Rate limit exceeded (15 min cooldown)"
+            "description": "Upload multiple chapters via JSON file. File must contain an array of chapter objects.\n\n**VVVVI:**\n- YOU MUST HAVE THE `sample-chapters.json` FILE (AVAILABLE IN MY GITHUB REPO) AND USE IT HERE WHEN HITTING THE UPLOAD BULK API ENDPOINT.\n- SAVE THE FILE IN THAT ENDPOINT AND THEN RUN THE COLLECTION.\n\n**Rate Limits:**\n- 5 requests per minute for bulk uploads\n- 900 second (15 minute) cooldown on rate limit exceeded\n\n**Important Notes:**\n- Wait at least 15 seconds between upload attempts\n- Collection enforces automatic delays\n- Rate limit is shared across all requests from same IP\n\n**Required Headers:**\n- x-api-key: Admin API key\n\n**Response:**\n- 200: Upload successful\n- 400: Invalid file format\n- 401: Missing/invalid API key\n- 429: Rate limit exceeded (15 min cooldown)"
           }
         }
       ]

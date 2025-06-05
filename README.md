@@ -5,7 +5,7 @@
 - Base URL: `http://13.60.65.158`
 - API Documentation: `http://13.60.65.158/api/docs`
 - AWS EC2: `http://13.60.65.158`
-- Render: `https://backend-assign-inoj.onrender.com` (Add your Render URL after deployment)
+- Render: `https://backend-assign-inoj.onrender.com`
 
 ## Deployment Information
 
@@ -452,3 +452,121 @@ pm2 stop all
 ## Health Check
 
 The API includes a health check endpoint at `/health` that returns server status.
+
+## Postman Collection Setup
+
+### Quick Start
+
+1. Import the collection file: `mathongo-chapter-dashboard.postman_collection.json`
+2. Start using it immediately - collection defaults to localhost (http://localhost:3000)
+
+### Why Default to Localhost?
+
+#### Render Free Tier Limitations
+
+1. **Cold Starts**:
+
+   - Free tier services spin down after 15 minutes of inactivity
+   - First request after inactivity takes 30-45 seconds to "wake up" the service
+   - This makes testing and development slow and frustrating
+
+2. **Development Workflow**:
+   - Using localhost during development gives instant responses
+   - No cold start delays
+   - Faster feedback loop while coding
+   - Easier to debug and test changes
+
+#### When to Use Render URL
+
+Use the Render URL (`https://mathongo-backend.onrender.com`) when:
+
+- Sharing the API with others
+- Testing production environment
+- Final verification before sharing
+- Demo purposes
+
+To switch to Render URL, be aware:
+
+- First request might take 30-45 seconds (cold start)
+- Subsequent requests will be faster until the service goes inactive
+- Service sleeps after 15 minutes of no activity
+
+### Environment Variables (Optional)
+
+The collection includes default values for all variables. You only need to create an environment if you want to override these defaults.
+
+Default values in collection:
+
+```
+base_url: http://localhost:3000
+admin_api_key: mathongo_admin_2024_secure_key
+admin_setup_key: suraj123
+jwt_token: (auto-populated after login)
+```
+
+### Switching Between Local and Deployed API
+
+To switch between local and deployed versions, simply change the `base_url` variable:
+
+- For local testing: `http://localhost:3000` (recommended during development)
+- For deployed version: `https://mathongo-backend.onrender.com` (expect cold start delay)
+
+You can change this in two ways:
+
+1. Edit the collection variable directly:
+
+   - Click "..." next to collection name
+   - Choose "Edit"
+   - Go to "Variables" tab
+   - Change base_url value
+
+2. Create an environment and override the base_url:
+   - Click the gear icon (⚙️)
+   - Create new environment
+   - Add base_url variable
+   - Set desired value
+
+### Testing Flow
+
+1. Start with "Setup Admin" request
+2. Use "Login" request to get JWT token (automatically saved)
+3. All other requests will use the saved JWT token
+4. For file upload endpoints, use the provided mock-chapters.json file
+
+### Available Endpoints
+
+- Authentication
+
+  - POST /api/v1/auth/register
+  - POST /api/v1/auth/setup-admin
+  - POST /api/v1/auth/login
+
+- Chapters
+  - GET /api/v1/chapters
+  - GET /api/v1/chapters/:id
+  - POST /api/v1/chapters
+  - PUT /api/v1/chapters/:id
+  - DELETE /api/v1/chapters/:id
+  - POST /api/v1/chapters/upload (bulk upload)
+
+## File Upload Instructions
+
+To successfully upload chapters using the Postman collection, follow these steps:
+
+1. **Select the Sample Chapter File**:
+
+   - Navigate to the `3 - Upload Chapters (Bulk)` request in the Postman collection.
+   - In the request body, ensure the `form-data` option is selected.
+   - Attach the `sample-chapters.json` file to the `file` key.
+
+   **Note:** The file variable name is hardcoded in the collection file, which is why manual selection is necessary.
+
+2. **Save the Request**:
+
+   - After attaching the file, make sure to save the request to retain the changes.
+
+3. **Run the Collection**:
+   - Once the file is attached and the request is saved, you can run the collection.
+   - The upload will only work if the file is correctly attached before running the collection.
+
+By following these steps, you ensure that the file upload process is correctly configured and will execute successfully during the collection run.

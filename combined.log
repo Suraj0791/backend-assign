@@ -116,3 +116,9 @@
 {"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T09:08:17.985Z"}
 {"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T09:08:18.932Z"}
 {"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T09:08:18.949Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T15:47:37.901Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T15:47:39.027Z"}
+{"level":"info","message":"Server is running on 0.0.0.0:3000","timestamp":"2025-06-05T15:47:39.042Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T16:03:19.130Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T16:03:20.206Z"}
+{"level":"info","message":"Server is running on 0.0.0.0:3000","timestamp":"2025-06-05T16:03:20.215Z"}

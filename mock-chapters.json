@@ -238,35 +238,35 @@
         "isWeakChapter": false
     },
     {
+        "name": "Introduction to Algebra",
         "subject": "Mathematics",
-        "chapter": "Introduction to Algebra",
-        "class": "Class 11",
-        "unit": "Unit 1",
-        "yearWiseQuestionCount": {
-            "2019": 5,
-            "2020": 8,
-            "2021": 10,
-            "2022": 12,
-            "2023": 15,
-            "2024": 0,
-            "2025": 0
-        },
-        "status": "Not Started"
+        "topics": [
+            "Basic Algebra",
+            "Variables",
+            "Constants"
+        ],
+        "difficulty": "easy",
+        "importance": "high"
     },
     {
+        "name": "Linear Equations",
         "subject": "Mathematics",
-        "chapter": "Linear Equations",
-        "class": "Class 11",
-        "unit": "Unit 1",
-        "yearWiseQuestionCount": {
-            "2019": 3,
-            "2020": 6,
-            "2021": 9,
-            "2022": 11,
-            "2023": 14,
-            "2024": 0,
-            "2025": 0
-        },
-        "status": "Not Started"
+        "topics": [
+            "Equations",
+            "Linear Functions"
+        ],
+        "difficulty": "medium",
+        "importance": "high"
+    },
+    {
+        "name": "Quadratic Equations",
+        "subject": "Mathematics",
+        "topics": [
+            "Equations",
+            "Quadratic Functions",
+            "Roots"
+        ],
+        "difficulty": "hard",
+        "importance": "medium"
     }
 ]
