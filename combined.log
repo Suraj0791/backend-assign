@@ -46,3 +46,73 @@
 {"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T05:53:13.839Z"}
 {"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T05:53:14.813Z"}
 {"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T05:53:14.816Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T06:21:59.878Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T06:22:01.604Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T06:22:02.570Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T06:22:02.575Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T06:22:05.670Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T06:22:08.061Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T06:22:08.968Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T06:22:08.970Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T06:22:10.568Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T06:22:11.506Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T06:22:11.510Z"}
+{"level":"error","message":"CastError: Cast to ObjectId failed for value \"{{created_chapter_id}}\" (type string) at path \"_id\" for model \"Chapter\"\n    at SchemaObjectId.cast (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\schema\\objectId.js:251:11)\n    at SchemaType.applySetters (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\schemaType.js:1255:12)\n    at SchemaType.castForQuery (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\schemaType.js:1673:17)\n    at cast (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\cast.js:390:32)\n    at Query.cast (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\query.js:5055:12)\n    at Query._castConditions (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\query.js:2351:10)\n    at model.Query._findOne (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\query.js:2674:8)\n    at model.Query.exec (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\mongoose\\lib\\query.js:4604:80)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getChapterById (E:\\REACT VITE APPS\\mathongo-backend\\src\\controllers\\chapter.controller.js:44:21)","timestamp":"2025-06-05T06:50:16.297Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T07:19:13.476Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T07:19:14.407Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T07:19:14.415Z"}
+{"level":"error","message":"SyntaxError: Unexpected token '-', \"----------\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at createStrictSyntaxError (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n    at parse (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n    at E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:238:16)\n    at done (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:519:28)\n    at endReadableNT (node:internal/streams/readable:1696:12)","timestamp":"2025-06-05T07:58:32.873Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:13:16.471Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:13:17.447Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:13:17.450Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:14:18.702Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:14:20.400Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:14:20.403Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:19:06.918Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:19:08.117Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:19:08.120Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:23:14.953Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:23:16.129Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:23:16.131Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:26:35.607Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:26:36.652Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:26:36.654Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:28:56.067Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:28:57.034Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:28:57.037Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:29:00.993Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:29:02.203Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:29:02.208Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:29:42.322Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:29:43.255Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:29:43.261Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:32:33.175Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:32:34.126Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:32:34.132Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:45:51.475Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:45:53.507Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:45:53.513Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:48:52.382Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:48:53.675Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:48:53.678Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:50:12.072Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:50:13.050Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:50:13.053Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:50:45.624Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:50:46.894Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:50:46.897Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:50:54.497Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:50:55.456Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:52:33.594Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:52:34.834Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:52:34.837Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:52:49.015Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:52:50.017Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:52:50.021Z"}
+{"level":"error","message":"SyntaxError: Unexpected token '-', \"----------\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at createStrictSyntaxError (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n    at parse (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n    at E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:238:16)\n    at done (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (E:\\REACT VITE APPS\\mathongo-backend\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:519:28)\n    at endReadableNT (node:internal/streams/readable:1696:12)","timestamp":"2025-06-05T08:54:17.683Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T08:58:13.888Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T08:58:14.855Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T08:58:14.865Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2025-06-05T09:08:17.985Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2025-06-05T09:08:18.932Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-05T09:08:18.949Z"}

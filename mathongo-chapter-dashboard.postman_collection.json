@@ -1,408 +1,725 @@
 {
-    "info": {
-        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "name": "MathonGo Chapter Dashboard",
-        "description": "API collection for MathonGo Chapter Dashboard with admin authentication and chapter management",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  "info": {
+    "name": "Chapter Management API",
+    "description": "Complete API collection for Chapter Management System with authentication, rate limiting, caching, and CRUD operations.\n\n## Features\n- User registration and authentication\n- Admin setup and authentication\n- Chapter CRUD operations with filtering and pagination\n- File upload for bulk chapter creation\n- Redis-based caching and rate limiting\n- Comprehensive error handling\n\n## Environment Variables\nSet up these variables in your Postman environment:\n- `base_url`: API base URL (e.g., http://localhost:3000)\n- `admin_api_key`: Admin API key for authentication\n- `admin_setup_key`: Special key for admin setup\n- `jwt_token`: JWT token for user authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
     },
-    "item": [
+    {
+      "key": "admin_api_key",
+      "value": "mathongo_admin_2024_secure_key",
+      "type": "string"
+    },
+    {
+      "key": "admin_setup_key",
+      "value": "suraj123",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_chapter_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User registration, admin setup, and login endpoints",
+      "item": [
         {
-            "name": "Authentication",
-            "description": "Authentication endpoints for user registration and login",
-            "item": [
-                {
-                    "name": "Register Regular User",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"testuser_{{$timestamp}}\",\n    \"password\": \"Test123!\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/auth/register",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "register"
-                            ]
-                        },
-                        "description": "Register a new regular user with a unique username using a timestamp."
-                    }
-                },
-                {
-                    "name": "Setup Admin User",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "if (pm.response.code === 201 && jsonData.status === 'success') {",
-                                    "    var createdUsername = pm.request.body.raw ? JSON.parse(pm.request.body.raw).username : null;",
-                                    "    if (createdUsername) {",
-                                    "        pm.environment.set('admin_username', createdUsername);",
-                                    "        console.log('Captured admin username: ' + createdUsername);",
-                                    "    }",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "x-api-key",
-                                "value": "{{admin_api_key}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin_{{$timestamp}}\",\n    \"password\": \"Admin123!\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/auth/setup-admin",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "setup-admin"
-                            ]
-                        },
-                        "description": "Create a new admin user with a unique username using a timestamp (requires admin API key)"
-                    }
-                },
-                {
-                    "name": "Login",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "if (jsonData.token) {",
-                                    "    pm.environment.set('auth_token', jsonData.token);",
-                                    "    console.log('Captured auth token.');",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"{{admin_username}}\",\n    \"password\": \"Admin123!\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/auth/login",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "login"
-                            ]
-                        },
-                        "description": "Login with the admin username captured from the setup request to get JWT token."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Chapters",
-            "description": "Chapter management endpoints",
-            "item": [
-                {
-                    "name": "Get All Chapters",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/chapters?page=1&limit=10&class=12&unit=1&status=active&weakChapters=true&subject=Mathematics",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters"
-                            ],
-                            "query": [
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Page number for pagination"
-                                },
-                                {
-                                    "key": "limit",
-                                    "value": "10",
-                                    "description": "Number of items per page"
-                                },
-                                {
-                                    "key": "class",
-                                    "value": "12",
-                                    "description": "Filter by class"
-                                },
-                                {
-                                    "key": "unit",
-                                    "value": "1",
-                                    "description": "Filter by unit"
-                                },
-                                {
-                                    "key": "status",
-                                    "value": "active",
-                                    "description": "Filter by status"
-                                },
-                                {
-                                    "key": "weakChapters",
-                                    "value": "true",
-                                    "description": "Filter weak chapters"
-                                },
-                                {
-                                    "key": "subject",
-                                    "value": "Mathematics",
-                                    "description": "Filter by subject"
-                                }
-                            ]
-                        },
-                        "description": "Get all chapters with filters and pagination"
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Create Chapter",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "if (jsonData.data && jsonData.data.id) {",
-                                    "    pm.environment.set('chapter_id', jsonData.data.id);",
-                                    "    console.log('Captured chapter ID: ' + jsonData.data.id);",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Integration\",\n    \"class\": 12,\n    \"unit\": 1,\n    \"subject\": \"Mathematics\",\n    \"status\": \"active\",\n    \"isWeakChapter\": false,\n    \"description\": \"Integration techniques and applications\",\n    \"difficultyLevel\": \"medium\",\n    \"estimatedTime\": 120,\n    \"prerequisites\": [\"Differentiation\", \"Basic Calculus\"],\n    \"learningObjectives\": [\n        \"Understand integration techniques\",\n        \"Apply integration in real-world problems\"\n    ]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/chapters",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters"
-                            ]
-                        },
-                        "description": "Create a new chapter. Requires admin authentication."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Get Chapter by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters",
-                                "{{chapter_id}}"
-                            ]
-                        },
-                        "description": "Get a specific chapter by its ID."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Update Chapter",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Advanced Integration\",\n    \"class\": 12,\n    \"unit\": 1,\n    \"subject\": \"Mathematics\",\n    \"status\": \"active\",\n    \"isWeakChapter\": true,\n    \"description\": \"Advanced integration techniques and applications\",\n    \"difficultyLevel\": \"hard\",\n    \"estimatedTime\": 150,\n    \"prerequisites\": [\"Basic Integration\", \"Calculus\"],\n    \"learningObjectives\": [\n        \"Master advanced integration techniques\",\n        \"Apply integration in complex problems\"\n    ]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters",
-                                "{{chapter_id}}"
-                            ]
-                        },
-                        "description": "Update an existing chapter."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Upload Multiple Chapters",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "file",
-                                    "type": "file",
-                                    "src": "sample-chapters.json"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/chapters/upload",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters",
-                                "upload"
-                            ]
-                        },
-                        "description": "Upload multiple chapters via JSON file."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Delete Chapter",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{auth_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/chapters/{{chapter_id}}",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "chapters",
-                                "{{chapter_id}}"
-                            ]
-                        },
-                        "description": "Delete a chapter."
-                    },
-                    "response": []
-                }
-            ]
-        }
-    ],
-    "event": [
-        {
-            "listen": "prerequest",
-            "script": {
-                "type": "text/javascript",
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
                 "exec": [
-                    "// Generate a timestamp for unique usernames",
-                    "pm.environment.set('timestamp', Date.now());"
-                ]
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success status', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{$guid}}\",\n  \"password\": \"testpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user account with default 'user' role.\n\n**Required Fields:**\n- username: Unique username (string)\n- password: User password (string)\n\n**Response:**\n- 201: User registered successfully\n- 400: Username already exists or missing fields"
+          }
         },
         {
-            "listen": "test",
-            "script": {
-                "type": "text/javascript",
+          "name": "Setup Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
                 "exec": [
-                    ""
-                ]
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Admin created successfully', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.message).to.include('Admin user created');",
+                  "    ",
+                  "    // Capture the created admin username for login from the request body",
+                  "    const requestBody = JSON.parse(pm.request.body.raw);",
+                  "    pm.collectionVariables.set('admin_username', requestBody.username);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-setup-key",
+                "value": "{{admin_setup_key}}",
+                "description": "Special admin setup key"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{$guid}}\",\n  \"password\": \"adminpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/setup-admin",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "setup-admin"
+              ]
+            },
+            "description": "Create an admin user account. Requires special admin setup key.\n\n**Required Headers:**\n- x-admin-setup-key: Admin setup key from environment variables\n\n**Required Fields:**\n- username: Admin username (string)\n- password: Admin password (string)\n\n**Response:**\n- 201: Admin created successfully\n- 403: Invalid admin setup key\n- 400: Missing fields or username exists"
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains JWT token', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    ",
+                  "    // Store JWT token for future requests",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"adminpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticate user and receive JWT token.\n\n**Required Fields:**\n- username: User's username (string)\n- password: User's password (string)\n\n**Response:**\n- 200: Login successful with JWT token\n- 401: Invalid credentials\n- 400: Missing username or password\n\n**Note:** JWT token is automatically stored in collection variables for subsequent requests."
+          }
         }
-    ],
-    "variable": [
+      ]
+    },
+    {
+      "name": "Chapters",
+      "description": "Chapter management endpoints with CRUD operations, filtering, and pagination",
+      "item": [
         {
-            "key": "base_url",
-            "value": "http://localhost:3000/api/v1",
-            "type": "string"
+          "name": "1 - Get All Chapters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains pagination info and sets chapter ID', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.total).to.exist;",
+                  "    pm.expect(jsonData.page).to.exist;",
+                  "    pm.expect(jsonData.limit).to.exist;",
+                  "    pm.expect(jsonData.chapters).to.be.an('array');",
+                  "    ",
+                  "    // Store first chapter ID for other requests if chapters exist",
+                  "    if (jsonData.chapters && jsonData.chapters.length > 0) {",
+                  "        const firstChapter = jsonData.chapters[0];",
+                  "        pm.collectionVariables.set('created_chapter_id', firstChapter._id);",
+                  "        console.log('✅ Set chapter ID for testing:', firstChapter._id);",
+                  "        postman.setNextRequest('2 - Get Chapter by ID');",
+                  "    } else {",
+                  "        console.log('❌ No chapters found to test with');",
+                  "        postman.setNextRequest(null);",
+                  "    }",
+                  "});",
+                  "",
+                  "if (pm.response.headers.get('X-Cache-Hit')) {",
+                  "    console.log('🚀 Response was cached');",
+                  "}",
+                  "",
+                  "// Store total chapters count for other requests",
+                  "if (pm.response.json().total > 0) {",
+                  "    pm.collectionVariables.set('total_chapters', pm.response.json().total);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{admin_api_key}}",
+                "description": "Required admin API key"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieve all chapters with optional filtering and pagination. Response is cached for 1 hour.\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 10)\n- class: Filter by class\n- unit: Filter by unit\n- status: Filter by status\n- subject: Filter by subject\n- weakChapters: Filter weak chapters (true/false)\n\n**Headers:**\n- x-api-key: Optional admin API key for enhanced access\n\n**Response Features:**\n- Pagination metadata\n- Cache information (_cached, _responseTime)\n- Rate limiting headers"
+          }
         },
         {
-            "key": "auth_token",
-            "value": "",
-            "type": "string"
+          "name": "2 - Get Chapter by ID",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Check if we have a chapter ID",
+                  "const chapterId = pm.collectionVariables.get('created_chapter_id');",
+                  "if (!chapterId) {",
+                  "    console.log('❌ No chapter ID found. Run \"Get All Chapters\" first.');",
+                  "    postman.setNextRequest(null);",
+                  "} else {",
+                  "    console.log('✅ Using chapter ID:', chapterId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Log the full response for debugging",
+                  "console.log('Response received:', JSON.stringify(pm.response.json(), null, 2));",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Status code is 200', function () {",
+                  "        pm.response.to.have.status(200);",
+                  "    });",
+                  "    ",
+                  "    pm.test('Response contains chapter data', function () {",
+                  "        const response = pm.response.json();",
+                  "        console.log('Testing response structure:', Object.keys(response));",
+                  "",
+                  "        try {",
+                  "            // Get the actual chapter data",
+                  "            const chapter = response._doc || response;",
+                  "",
+                  "            // Basic required fields",
+                  "            pm.expect(chapter, 'Response should be an object').to.be.an('object');",
+                  "            pm.expect(chapter.subject, 'Should have subject').to.exist;",
+                  "            pm.expect(chapter.chapter, 'Should have chapter name').to.exist;",
+                  "            pm.expect(chapter.class, 'Should have class').to.exist;",
+                  "            pm.expect(chapter.unit, 'Should have unit').to.exist;",
+                  "            pm.expect(chapter.status, 'Should have status').to.exist;",
+                  "",
+                  "            // Complex objects",
+                  "            pm.expect(chapter.yearWiseQuestionCount, 'Should have yearWiseQuestionCount').to.exist;",
+                  "            pm.expect(chapter.yearWiseQuestionCount, 'yearWiseQuestionCount should be an object').to.be.an('object');",
+                  "",
+                  "            // Metadata fields",
+                  "            pm.expect(chapter.createdAt, 'Should have createdAt').to.exist;",
+                  "            pm.expect(chapter.updatedAt, 'Should have updatedAt').to.exist;",
+                  "",
+                  "            // Cache information",
+                  "            if (response._cached !== undefined) {",
+                  "                console.log('🚀 Cache status:', response._cached ? 'HIT' : 'MISS');",
+                  "                console.log('⏱️ Response time:', response._responseTime, 'ms');",
+                  "            }",
+                  "",
+                  "            // Verify this is the chapter we requested",
+                  "            const requestedId = pm.collectionVariables.get('created_chapter_id');",
+                  "            const responseId = chapter._id || (chapter.$__?.activePaths?.paths?._id === 'init' ? requestedId : null);",
+                  "            pm.expect(responseId, 'ID should match requested chapter').to.exist;",
+                  "",
+                  "            console.log('✅ All chapter data validations passed');",
+                  "            console.log('Chapter details:', {",
+                  "                subject: chapter.subject,",
+                  "                chapter: chapter.chapter,",
+                  "                class: chapter.class,",
+                  "                unit: chapter.unit,",
+                  "                status: chapter.status",
+                  "            });",
+                  "        } catch (error) {",
+                  "            console.log('❌ Validation error:', error.message);",
+                  "            console.log('Response structure:', JSON.stringify(response, null, 2));",
+                  "            throw error;",
+                  "        }",
+                  "    });",
+                  "",
+                  "    // Set next request in the sequence",
+                  "    postman.setNextRequest('3 - Upload Chapters (Bulk)');",
+                  "} else if (pm.response.code === 404) {",
+                  "    pm.test('Chapter not found returns 404', function () {",
+                  "        pm.response.to.have.status(404);",
+                  "        console.log('❌ Chapter not found:', pm.collectionVariables.get('created_chapter_id'));",
+                  "    });",
+                  "    postman.setNextRequest(null);",
+                  "} else {",
+                  "    pm.test('Unexpected response code: ' + pm.response.code, function () {",
+                  "        console.log('❌ Unexpected response:', pm.response.json());",
+                  "        pm.expect.fail('Unexpected response code: ' + pm.response.code);",
+                  "    });",
+                  "    postman.setNextRequest(null);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{admin_api_key}}",
+                "description": "Optional admin API key"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters/{{created_chapter_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                "{{created_chapter_id}}"
+              ]
+            },
+            "description": "Retrieve a specific chapter by its MongoDB ObjectId. Response is cached for 1 hour.\n\n**Prerequisites:**\n- Run \"Get All Chapters\" first to set a valid chapter ID\n\n**URL Parameters:**\n- id: MongoDB ObjectId of the chapter (automatically set from Get All Chapters response)\n\n**Response Fields:**\n- _id: Chapter ID\n- chapter: Chapter name\n- subject: Subject name\n- class: Class name\n- unit: Unit name\n- status: Chapter status\n- yearWiseQuestionCount: Question counts by year\n- questionSolved: Number of questions solved\n- isWeakChapter: Whether it's marked as weak\n- createdAt: Creation timestamp\n- updatedAt: Last update timestamp\n\n**Response:**\n- 200: Chapter found and returned\n- 404: Chapter not found\n- 400: Invalid ObjectId format"
+          }
         },
         {
-            "key": "chapter_id",
-            "value": "",
-            "type": "string"
-        },
-        {
-            "key": "admin_api_key",
-            "value": "",
-            "type": "string"
-        },
-        {
-            "key": "admin_username",
-            "value": "",
-            "type": "string"
+          "name": "3 - Upload Chapters (Bulk)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Fixed pre-request script - no .some() method usage",
+                  "console.log('📁 Using manually attached file for upload');",
+                  "console.log('🔧 Ensure mock-chapters.json is attached in Body tab');",
+                  "",
+                  "// Verify the file is attached (using proper iteration instead of .some())",
+                  "if (pm.request.body && pm.request.body.formdata) {",
+                  "    console.log('Form data exists, checking for file attachment...');",
+                  "    ",
+                  "    let fileAttached = false;",
+                  "    ",
+                  "    // Convert to array first, then iterate",
+                  "    const formDataArray = pm.request.body.formdata.members || pm.request.body.formdata;",
+                  "    ",
+                  "    // Check if it's iterable",
+                  "    if (formDataArray && formDataArray.length >= 0) {",
+                  "        for (let i = 0; i < formDataArray.length; i++) {",
+                  "            const item = formDataArray[i];",
+                  "            if (item && item.key === 'file' && (item.src || item.value)) {",
+                  "                fileAttached = true;",
+                  "                console.log('✅ File is attached to request');",
+                  "                console.log('File details:', {",
+                  "                    key: item.key,",
+                  "                    type: item.type,",
+                  "                    hasSrc: !!item.src,",
+                  "                    hasValue: !!item.value",
+                  "                });",
+                  "                break;",
+                  "            }",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    if (!fileAttached) {",
+                  "        console.log('❌ No file attached - please attach manually in request body');",
+                  "    }",
+                  "} else {",
+                  "    console.log('❌ No form data found in request body');",
+                  "}",
+                  "",
+                  "// Log request details for debugging",
+                  "console.log('Request body mode:', pm.request.body?.mode);",
+                  "console.log('Request URL:', pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// First check if file was properly attached",
+                  "if (!pm.request.body || !pm.request.body.formdata) {",
+                  "    console.error('❌ No form data in request!');",
+                  "}",
+                  "",
+                  "if (pm.response.code === 400) {",
+                  "    console.error('Upload failed:', pm.response.json());",
+                  "    console.log('Debug info:');",
+                  "    console.log('- Request headers:', pm.request.headers);",
+                  "    console.log('- Request body mode:', pm.request.body.mode);",
+                  "    console.log('- Form data:', pm.request.body.formdata);",
+                  "}",
+                  "",
+                  "pm.test('Response is successful', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Chapters were uploaded', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.inserted).to.be.a('number');",
+                  "    pm.expect(jsonData.inserted).to.be.at.least(1);",
+                  "    console.log('Upload results:', {",
+                  "        inserted: jsonData.inserted,",
+                  "        failed: jsonData.failed || []",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{admin_api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": null,
+                  "enabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                "upload"
+              ]
+            },
+            "description": "Upload multiple chapters via JSON file. File must contain an array of chapter objects.\n\n**Rate Limits:**\n- 5 requests per minute for bulk uploads\n- 900 second (15 minute) cooldown on rate limit exceeded\n\n**Important Notes:**\n- Wait at least 15 seconds between upload attempts\n- Collection enforces automatic delays\n- Rate limit is shared across all requests from same IP\n\n**Required Headers:**\n- x-api-key: Admin API key\n\n**Response:**\n- 200: Upload successful\n- 400: Invalid file format\n- 401: Missing/invalid API key\n- 429: Rate limit exceeded (15 min cooldown)"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "name": "Testing & Utilities",
+      "description": "Test endpoints for debugging and verification",
+      "item": [
+        {
+          "name": "Test Environment Variables",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Environment variables are accessible', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.adminKey).to.exist;",
+                  "    pm.expect(jsonData.nodeEnv).to.exist;",
+                  "    pm.expect(jsonData.port).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters/test-env",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                "test-env"
+              ]
+            },
+            "description": "Test endpoint to verify environment variables are properly configured.\n\n**Response:**\n- adminKey: Shows if ADMIN_API_KEY is set\n- nodeEnv: Current NODE_ENV value\n- port: Current PORT value"
+          }
+        },
+        {
+          "name": "Test Cache Functionality",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains cache information', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('cached');",
+                  "    pm.expect(jsonData.timestamp).to.exist;",
+                  "    pm.expect(jsonData.cacheKey).to.exist;",
+                  "    pm.expect(jsonData._cached).to.exist;",
+                  "    pm.expect(jsonData._responseTime).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters/test-cache",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                "test-cache"
+              ]
+            },
+            "description": "Test endpoint to verify Redis caching functionality."
+          }
+        },
+        {
+          "name": "Reset Rate Limits",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Rate limits were reset', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql('Rate limits reset successfully');",
+                  "    console.log('Cleared rate limit keys:', jsonData.clearedKeys);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{admin_api_key}}",
+                "description": "Required admin API key"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chapters/reset-limits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                "reset-limits"
+              ]
+            },
+            "description": "Reset all rate limits in Redis. This endpoint requires admin authentication.\n\n**Required Headers:**\n- x-api-key: Admin API key\n\n**Response:**\n- 200: Rate limits reset successfully\n- 401: Missing/invalid API key\n- 500: Server error"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Collection-level rate limit handling",
+          "const minimumDelay = 2000; // 2 seconds base delay",
+          "const uploadEndpoint = '/api/v1/chapters/upload';",
+          "",
+          "// Special handling for upload endpoint",
+          "if (pm.request.url.toString().includes(uploadEndpoint)) {",
+          "    const uploadDelay = 15000; // 15 seconds for upload requests",
+          "    console.log(`⏳ Upload endpoint detected. Adding ${uploadDelay/1000}s delay...`);",
+          "    setTimeout(() => {}, uploadDelay);",
+          "} else {",
+          "    const lastRequestTime = pm.variables.get('lastRequestTime');",
+          "    const currentTime = Date.now();",
+          "",
+          "    if (lastRequestTime) {",
+          "        const timeSinceLastRequest = currentTime - parseInt(lastRequestTime);",
+          "        if (timeSinceLastRequest < minimumDelay) {",
+          "            const waitTime = minimumDelay - timeSinceLastRequest;",
+          "            console.log(`⏳ Adding delay of ${waitTime}ms between requests...`);",
+          "            setTimeout(() => {}, waitTime);",
+          "        }",
+          "    }",
+          "}",
+          "",
+          "pm.variables.set('lastRequestTime', Date.now().toString());",
+          "console.log('🔄 Making request to:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Handle rate limiting response",
+          "if (pm.response.code === 429) {",
+          "    const retryAfter = pm.response.headers.get('Retry-After');",
+          "    if (retryAfter) {",
+          "        const waitMs = parseInt(retryAfter) * 1000;",
+          "        console.log(`Rate limited. Waiting ${waitMs}ms before retry...`);",
+          "        setTimeout(() => {}, waitMs);",
+          "    }",
+          "}",
+          "",
+          "console.log('Response received at:', new Date().toISOString());",
+          "console.log('Status code:', pm.response.code);",
+          "console.log('Response time:', pm.response.responseTime + 'ms');",
+          "",
+          "const rateLimitRemaining = pm.response.headers.get('X-RateLimit-Remaining');",
+          "if (rateLimitRemaining) {",
+          "    console.log('Rate limit remaining:', rateLimitRemaining);",
+          "}"
+        ]
+      }
+    }
+  ]
 }

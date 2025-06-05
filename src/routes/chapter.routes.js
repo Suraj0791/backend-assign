@@ -32,7 +32,13 @@ const uploadRateLimiter = redisRateLimiter({
 });
 
 // GET all chapters with filters, pagination, and caching
-router.get("/", generalRateLimiter, cacheMiddleware(3600), optionalAuth, getChapters);
+router.get(
+  "/",
+  generalRateLimiter,
+  cacheMiddleware(3600),
+  optionalAuth,
+  getChapters
+);
 
 // Test endpoint to verify environment variables
 router.get("/test-env", generalRateLimiter, (req, res) => {
@@ -44,23 +50,59 @@ router.get("/test-env", generalRateLimiter, (req, res) => {
 });
 
 // Test endpoint to check Redis caching
-router.get("/test-cache", generalRateLimiter, cacheMiddleware(3600), (req, res) => {
-  const timestamp = new Date().toISOString();
-  res.json({
-    message: "This response is cached for 1 hour",
-    timestamp: timestamp,
-    cacheKey: `cache:/api/v1/chapters/test-cache`,
-  });
+router.get(
+  "/test-cache",
+  generalRateLimiter,
+  cacheMiddleware(3600),
+  (req, res) => {
+    const timestamp = new Date().toISOString();
+    res.json({
+      message: "This response is cached for 1 hour",
+      timestamp: timestamp,
+      cacheKey: `cache:/api/v1/chapters/test-cache`,
+    });
+  }
+);
+
+// Reset rate limits (admin only)
+router.post("/reset-limits", authenticateAdmin, async (req, res) => {
+  try {
+    const { redisHelper } = require("../config/redis.config");
+    const keys = await redisHelper.keys("rate_limit:*");
+    console.log("Found rate limit keys:", keys);
+
+    if (keys.length > 0) {
+      await Promise.all(keys.map((key) => redisHelper.del(key)));
+      console.log("Cleared rate limit keys:", keys);
+    }
+
+    res.json({
+      message: "Rate limits reset successfully",
+      clearedKeys: keys,
+    });
+  } catch (error) {
+    console.error("Error resetting rate limits:", error);
+    res.status(500).json({
+      error: "Failed to reset rate limits",
+      message: error.message,
+    });
+  }
 });
 
 // GET chapter by ID
-router.get("/:id", generalRateLimiter, cacheMiddleware(3600), optionalAuth, getChapterById);
+router.get(
+  "/:id",
+  generalRateLimiter,
+  cacheMiddleware(3600),
+  optionalAuth,
+  getChapterById
+);
 
 // POST upload chapters (admin only, JSON file upload)
 router.post(
   "/upload",
-  uploadRateLimiter,
   authenticateAdmin,
+  uploadRateLimiter,
   upload.single("file"),
   handleUploadError,
   uploadChapters

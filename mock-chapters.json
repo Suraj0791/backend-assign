@@ -1,0 +1,272 @@
+[
+    {
+        "chapter": "Mathematics in Physics",
+        "class": "Class 11",
+        "subject": "Physics",
+        "unit": "Mechanics 1",
+        "chapterNumber": 1,
+        "description": "Understanding mathematical concepts used in physics",
+        "status": "Not Started",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 0,
+            "2020": 2,
+            "2021": 5,
+            "2022": 5,
+            "2023": 3,
+            "2024": 7,
+            "2025": 6
+        },
+        "questionSolved": 0
+    },
+    {
+        "chapter": "Units and Dimensions",
+        "class": "Class 11",
+        "subject": "Physics",
+        "unit": "Mechanics 1",
+        "chapterNumber": 2,
+        "description": "Basic concepts of units and dimensions in physics",
+        "status": "Completed",
+        "isWeakChapter": true,
+        "yearWiseQuestionCount": {
+            "2019": 2,
+            "2020": 6,
+            "2021": 8,
+            "2022": 4,
+            "2023": 6,
+            "2024": 3,
+            "2025": 10
+        },
+        "questionSolved": 39
+    },
+    {
+        "chapter": "Calculus Basics",
+        "class": "Class 11",
+        "subject": "Mathematics",
+        "unit": "Unit 1",
+        "chapterNumber": 1,
+        "description": "Introduction to differential calculus",
+        "status": "Not Started",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 5,
+            "2020": 4,
+            "2021": 6,
+            "2022": 7,
+            "2023": 8,
+            "2024": 5,
+            "2025": 4
+        },
+        "questionSolved": 0
+    },
+    {
+        "chapter": "Chemical Bonding",
+        "class": "Class 11",
+        "subject": "Chemistry",
+        "unit": "Chemical Fundamentals",
+        "chapterNumber": 1,
+        "description": "Understanding different types of chemical bonds",
+        "status": "Completed",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 8,
+            "2020": 7,
+            "2021": 5,
+            "2022": 6,
+            "2023": 4,
+            "2024": 8,
+            "2025": 7
+        },
+        "questionSolved": 45
+    },
+    {
+        "chapter": "Organic Chemistry Basics",
+        "class": "Class 11",
+        "subject": "Chemistry",
+        "unit": "Organic Chemistry",
+        "chapterNumber": 2,
+        "description": "Introduction to organic compounds and their properties",
+        "status": "In Progress",
+        "isWeakChapter": true,
+        "yearWiseQuestionCount": {
+            "2019": 6,
+            "2020": 8,
+            "2021": 7,
+            "2022": 5,
+            "2023": 9,
+            "2024": 6,
+            "2025": 8
+        },
+        "questionSolved": 25
+    },
+    {
+        "chapter": "Trigonometry",
+        "class": "Class 11",
+        "subject": "Mathematics",
+        "unit": "Unit 2",
+        "chapterNumber": 2,
+        "description": "Advanced concepts in trigonometry",
+        "status": "Completed",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 7,
+            "2020": 6,
+            "2021": 8,
+            "2022": 9,
+            "2023": 5,
+            "2024": 7,
+            "2025": 6
+        },
+        "questionSolved": 48
+    },
+    {
+        "chapter": "Vectors",
+        "class": "Class 11",
+        "subject": "Physics",
+        "unit": "Mechanics 2",
+        "chapterNumber": 3,
+        "description": "Understanding vectors and their applications",
+        "status": "In Progress",
+        "isWeakChapter": true,
+        "yearWiseQuestionCount": {
+            "2019": 4,
+            "2020": 5,
+            "2021": 7,
+            "2022": 8,
+            "2023": 6,
+            "2024": 9,
+            "2025": 5
+        },
+        "questionSolved": 20
+    },
+    {
+        "chapter": "Cell Biology",
+        "class": "Class 11",
+        "subject": "Biology",
+        "unit": "Cell Structure",
+        "chapterNumber": 1,
+        "description": "Study of cell structure and functions",
+        "status": "Not Started",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 5,
+            "2020": 6,
+            "2021": 4,
+            "2022": 7,
+            "2023": 8,
+            "2024": 5,
+            "2025": 6
+        },
+        "questionSolved": 0
+    },
+    {
+        "chapter": "Genetics",
+        "class": "Class 11",
+        "subject": "Biology",
+        "unit": "Inheritance",
+        "chapterNumber": 2,
+        "description": "Principles of inheritance and variation",
+        "status": "In Progress",
+        "isWeakChapter": false,
+        "yearWiseQuestionCount": {
+            "2019": 6,
+            "2020": 7,
+            "2021": 5,
+            "2022": 8,
+            "2023": 6,
+            "2024": 7,
+            "2025": 5
+        },
+        "questionSolved": 15
+    },
+    {
+        "chapter": "Complex Numbers",
+        "class": "Class 11",
+        "subject": "Mathematics",
+        "unit": "Unit 3",
+        "chapterNumber": 3,
+        "description": "Understanding complex numbers and their operations",
+        "status": "Not Started",
+        "isWeakChapter": true,
+        "yearWiseQuestionCount": {
+            "2019": 7,
+            "2020": 8,
+            "2021": 6,
+            "2022": 5,
+            "2023": 7,
+            "2024": 6,
+            "2025": 8
+        },
+        "questionSolved": 0
+    },
+    {
+        "chapter": "Mock Chapter 1",
+        "class": "Class 11",
+        "subject": "Physics",
+        "unit": "Mechanics 1",
+        "chapterNumber": 1,
+        "status": "Not Started",
+        "yearWiseQuestionCount": {
+            "2019": 5,
+            "2020": 8,
+            "2021": 10,
+            "2022": 12,
+            "2023": 15,
+            "2024": 0,
+            "2025": 0
+        },
+        "questionSolved": 0,
+        "isWeakChapter": false
+    },
+    {
+        "chapter": "Mock Chapter 2",
+        "class": "Class 11",
+        "subject": "Physics",
+        "unit": "Mechanics 1",
+        "chapterNumber": 2,
+        "status": "Not Started",
+        "yearWiseQuestionCount": {
+            "2019": 3,
+            "2020": 6,
+            "2021": 9,
+            "2022": 11,
+            "2023": 14,
+            "2024": 0,
+            "2025": 0
+        },
+        "questionSolved": 0,
+        "isWeakChapter": false
+    },
+    {
+        "subject": "Mathematics",
+        "chapter": "Introduction to Algebra",
+        "class": "Class 11",
+        "unit": "Unit 1",
+        "yearWiseQuestionCount": {
+            "2019": 5,
+            "2020": 8,
+            "2021": 10,
+            "2022": 12,
+            "2023": 15,
+            "2024": 0,
+            "2025": 0
+        },
+        "status": "Not Started"
+    },
+    {
+        "subject": "Mathematics",
+        "chapter": "Linear Equations",
+        "class": "Class 11",
+        "unit": "Unit 1",
+        "yearWiseQuestionCount": {
+            "2019": 3,
+            "2020": 6,
+            "2021": 9,
+            "2022": 11,
+            "2023": 14,
+            "2024": 0,
+            "2025": 0
+        },
+        "status": "Not Started"
+    }
+]
