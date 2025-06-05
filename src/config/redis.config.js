@@ -9,13 +9,11 @@ const MAX_RETRIES = 5;
 const RETRY_DELAY = 5000; // 5 seconds
 
 const connectRedis = async () => {
-  // If already connecting, return the existing promise
   if (isConnecting && connectionPromise) {
     console.log("Redis connection already in progress, waiting...");
     return connectionPromise;
   }
 
-  // If already connected, return the client
   if (redisClient?.isOpen) {
     console.log("Redis client already connected");
     return redisClient;
@@ -27,7 +25,6 @@ const connectRedis = async () => {
   connectionPromise = new Promise(async (resolve, reject) => {
     while (retries < MAX_RETRIES) {
       try {
-        // Clean up any existing client
         if (redisClient && !redisClient.isOpen) {
           try {
             await redisClient.disconnect();
@@ -37,25 +34,35 @@ const connectRedis = async () => {
           redisClient = null;
         }
 
-        const redisConfig = {
-          url: `redis://${process.env.REDIS_USERNAME || 'default'}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST || 'localhost'}:${parseInt(process.env.REDIS_PORT) || 6379}/${process.env.REDIS_DB || 0}`,
-          socket: {
-            reconnectStrategy: (retries) => {
-              if (retries > 10) {
-                console.log("Redis max reconnection attempts reached");
-                return new Error("Redis max reconnection attempts reached");
-              }
-              return Math.min(retries * 100, 3000);
-            },
-            connectTimeout: 10000,
-            lazyConnect: true,
+        // First try REDIS_URL if available (Render provides this)
+        const redisConfig = process.env.REDIS_URL
+          ? { url: process.env.REDIS_URL }
+          : {
+              url: `redis://${process.env.REDIS_USERNAME || "default"}:${
+                process.env.REDIS_PASSWORD
+              }@${process.env.REDIS_HOST || "localhost"}:${
+                parseInt(process.env.REDIS_PORT) || 6379
+              }/${process.env.REDIS_DB || 0}`,
+            };
+
+        // Add socket configuration
+        redisConfig.socket = {
+          reconnectStrategy: (retries) => {
+            if (retries > 10) {
+              console.log("Redis max reconnection attempts reached");
+              return new Error("Redis max reconnection attempts reached");
+            }
+            return Math.min(retries * 100, 3000);
           },
+          connectTimeout: 10000,
+          lazyConnect: true,
         };
 
         console.log("Connecting to Redis with config:", {
+          url: process.env.REDIS_URL ? "(Using REDIS_URL)" : undefined,
           host: process.env.REDIS_HOST,
           port: process.env.REDIS_PORT,
-          username: process.env.REDIS_USERNAME || 'default',
+          username: process.env.REDIS_USERNAME || "default",
           database: process.env.REDIS_DB || 0,
         });
 
@@ -114,7 +121,6 @@ const connectRedis = async () => {
         isConnecting = false;
         resolve(redisClient);
         return;
-
       } catch (error) {
         console.error(`Redis connection attempt ${retries + 1} failed:`, error);
         retries++;
@@ -143,11 +149,13 @@ const getRedisClient = async () => {
     console.log("Redis client not available, attempting to connect...");
     await connectRedis();
   }
-  
+
   if (!redisClient?.isOpen) {
-    throw new Error("Redis client not initialized or closed. Connection failed.");
+    throw new Error(
+      "Redis client not initialized or closed. Connection failed."
+    );
   }
-  
+
   return redisClient;
 };
 
