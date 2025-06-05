@@ -11,6 +11,7 @@ const { connectRedis } = require("./config/redis.config");
 // Import routes
 const chapterRoutes = require("./routes/chapter.routes");
 const authRoutes = require("./routes/auth.routes");
+const docsRoutes = require("./routes/docs.routes");
 
 // Create Express app
 const app = express();
@@ -50,9 +51,23 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "Chapter Performance Dashboard API",
+    version: "1.0.0",
+    endpoints: {
+      chapters: "/api/v1/chapters",
+      auth: "/api/v1/auth",
+    },
+  });
+});
+
 // Routes
 app.use("/api/v1/chapters", chapterRoutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/docs", docsRoutes);
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
@@ -77,14 +92,18 @@ const initializeApp = async () => {
       await connectRedis();
       logger.info("Connected to Redis");
     } catch (error) {
-      logger.warn("Failed to connect to Redis, continuing without Redis:", error.message);
+      logger.warn(
+        "Failed to connect to Redis, continuing without Redis:",
+        error.message
+      );
       // Continue without Redis - the app can still function
     }
 
     // 3. Start Express server
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
+    const HOST = process.env.HOST || "0.0.0.0";
+    app.listen(PORT, HOST, () => {
+      logger.info(`Server is running on ${HOST}:${PORT}`);
     });
   } catch (error) {
     logger.error("Failed to initialize application:", error);

@@ -14,3 +14,5 @@ error.log
 *.log.*.*.*.*
 *.log.*.*.*.*.*
 *.log.*.*.*.*.*.*
+
+codex.pem
