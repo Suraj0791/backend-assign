@@ -17,4 +17,12 @@ services:
         sync: false # This means it's a secret you'll set in dashboard
       - key: JWT_SECRET
         sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_URL
+        sync: false
     autoDeploy: true # Enable auto-deployment on push to main branch
